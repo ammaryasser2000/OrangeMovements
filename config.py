@@ -1,23 +1,25 @@
 import os
 from dotenv import load_dotenv
 
+# تحميل بيانات ملف .env
 load_dotenv()
 
-BOT_TOKEN = os.getenv("8790701693:AAHfsOlGQVqp4zNLsgcs9Racjrk99U3bN2M")
+# توكن البوت
+BOT_TOKEN = os.getenv("e459b21995d2c3f98a86368c90a2efe0")
 
-# ضع Telegram ID 8907883947
-ADMIN_IDS = [e459b21995d2c3f98a86368c90a2efe0]
+# آيدي الأدمن
+ADMIN_IDS = [
+    35259577
+]
 
-# مدة الاشتراكات بالأيام
-WEEK_SUBSCRIPTION = 7
-MONTH_SUBSCRIPTION = 30
+# رابط الدعم
+SUPPORT = [
+    "@b_6_0",
+    "@b_6_01"
+]
 
-# اسم البوت
-BOT_NAME = "Orange Movements"
+# قاعدة البيانات
+DATABASE_NAME = "orange.db"
 
-# لغات البوت
-LANGUAGES = {
-    "ar": "العربية",
-    "en": "English",
-    "bn": "বাংলা"
-}
+# اللغات
+LANGUAGES = ["ar", "en", "bn"]
