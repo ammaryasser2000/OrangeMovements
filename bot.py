@@ -6,15 +6,21 @@ from telegram.ext import (
     ContextTypes,
     filters,
 )
-import os
 
-# قراءة التوكن من ملف .env
-TOKEN = os.getenv("BOT_TOKEN")
+from config import BOT_TOKEN
+from database import create_tables, add_user
 
-# حفظ لغة المستخدم مؤقتًا
-user_language = {}
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    user = update.effective_user
+
+    add_user(
+        user.id,
+        user.username,
+        user.full_name
+    )
+
     keyboard = [
         ["🇸🇦 العربية"],
         ["🇬🇧 English"],
@@ -22,19 +28,59 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     await update.message.reply_text(
-        "🌍 اختر لغتك / Choose your language / আপনার ভাষা নির্বাচন করুন",
-        reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True),
+        "🌍 اختر اللغة\n\nChoose Language\n\nভাষা নির্বাচন করুন",
+        reply_markup=ReplyKeyboardMarkup(
+            keyboard,
+            resize_keyboard=True
+        ),
     )
 
+
 async def language(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
     text = update.message.text
 
     if text == "🇸🇦 العربية":
-        user_language[update.effective_user.id] = "ar"
-        await update.message.reply_text("✅ تم اختيار اللغة العربية")
+
+        await update.message.reply_text(
+            "✅ تم اختيار العربية"
+        )
 
     elif text == "🇬🇧 English":
-        user_language[update.effective_user.id] = "en"
+
+        await update.message.reply_text(
+            "✅ English Selected"
+        )
+
+    elif text == "🇧🇩 বাংলা":
+
+        await update.message.reply_text(
+            "✅ বাংলা নির্বাচন করা হয়েছে"
+        )
+
+
+def main():
+
+    create_tables()
+
+    app = Application.builder().token(BOT_TOKEN).build()
+
+    app.add_handler(CommandHandler("start", start))
+
+    app.add_handler(
+        MessageHandler(
+            filters.TEXT,
+            language
+        )
+    )
+
+    print("Orange Movements Started")
+
+    app.run_polling()
+
+
+if __name__ == "__main__":
+    main()        user_language[update.effective_user.id] = "en"
         await update.message.reply_text("✅ English selected")
 
     elif text == "🇧🇩 বাংলা":
