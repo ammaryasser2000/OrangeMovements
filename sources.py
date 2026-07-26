@@ -59,8 +59,8 @@ class IVAS:
 class OrangeCarrier:
 
     def __init__(self, email, password):
-        self.email = email
-        self.password = password
+        self.email = ammar11ammar2019@gmail.com 
+        self.password = 7700208345Ab$
 
     async def login(self):
 
