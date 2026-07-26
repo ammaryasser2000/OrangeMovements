@@ -50,3 +50,24 @@ def get_user(user_id):
     conn.close()
 
     return user
+    # جدول الحركات الجديدة
+cur.execute("""
+CREATE TABLE IF NOT EXISTS movements (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    country TEXT,
+    number TEXT,
+    created_at TEXT
+)
+""")
+
+# جدول الاشتراكات
+cur.execute("""
+CREATE TABLE IF NOT EXISTS subscriptions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    plan TEXT,
+    start_date TEXT,
+    end_date TEXT,
+    active INTEGER DEFAULT 1
+)
+""")
