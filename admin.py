@@ -5,12 +5,12 @@ from telegram.ext import CommandHandler, ContextTypes
 from subscriptions import add_subscription
 
 # ضع هنا رقم حسابك في تيليجرام
-ADMIN_ID = 4915568330141
+ADMIN_ID = 8907883947
 
 
 async def week(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-    if update.effective_user.id != ADMIN_ID:4915568330141
+    if update.effective_user.id != ADMIN_ID:8907883947
         return
 
     if len(context.args) != 1:
