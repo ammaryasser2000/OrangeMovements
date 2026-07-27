@@ -6,7 +6,6 @@ from telegram.ext import (
     ContextTypes,
     filters,
 )
-
 from config import 8790701693:AAHfsOlGQVqp4zNLsgcs9Racjrk99U3bN2M
 from database import create_tables, add_user
 from admin import admin_handlers
@@ -47,7 +46,6 @@ def main():
             language
         )
     )
-
 for handler in admin_handlers:
         app.add_handler(handler)
 
