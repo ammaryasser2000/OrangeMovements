@@ -10,17 +10,24 @@ async def send_telegram_alert(message):
     except Exception as e:
         print("Telegram Error:", e)
 async def monitor_loop():
-    print("Starting monitoring loop...")
+    print("Starting monitoring loop for websites...")
     while True:
         try:
-            ivas = IVAS("example@gmail.com", "your_password")
+            # 1. فحص الموقع الأول IVAS (ضع بريدك وكلمة المرور بين علامات التنصيص)
+            ivas = IVAS("ammar11ammar2019@gmail.com", "7700208345Ab")
             await ivas.login()
-            html_content = await ivas.open_live()
-            await ivas.close()            
-            if html_content:
-                await send_telegram_alert("📊 تم فحص حركة المرور بنجاح!")            
+            ivas_data = await ivas.open_live()
+            await ivas.close()
+     if ivas_data:
+                await send_telegram_alert("📊 تم فحص حساب IVAS وسحب البيانات بنجاح!")
+            # 2. فحص الموقع الثاني OrangeCarrier (ضع بريدك وكلمة المرور بين علامات التنصيص)
+            orange = OrangeCarrier("ammar11ammar2019@gmail.com", "7700208345Ab$")
+            await orange.login()
+            orange_data = await orange.dashboard()
+            await orange.close()           
+            if orange_data:
+                await send_telegram_alert("📊 تم فحص حساب OrangeCarrier وسحب البيانات بنجاح!")           
         except Exception as e:
             print("Monitor Loop Error:", e)
+        # الفحص كل 60 ثانية (دقيقة واحدة)
         await asyncio.sleep(60)
-if __name__ == "__main__":
-    asyncio.run(monitor_loop())
