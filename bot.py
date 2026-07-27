@@ -33,18 +33,18 @@ async def traffic(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 def main():
     # إنشاء جداول قاعدة البيانات
-    create_tables()    
+    create_tables()
     # بناء التطبيق
-    application = ApplicationBuilder().token(TOKEN).build()    
+    application = ApplicationBuilder().token(TOKEN).build()  
     # إضافة الأوامر الأساسية وحركة المرور
     application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("traffic", traffic))    
+    application.add_handler(CommandHandler("traffic", traffic))   
     # إضافة أوامر الأدمن
     for handler in admin_handlers:
         application.add_handler(handler)        
     # إضافة أوامر المراقبة إن وجدت
     for handler in monitor_handlers:
-        application.add_handler(handler)     
+        application.add_handler(handler)        
     print("Bot is fully running with all file handlers...")
     application.run_polling()
 if __name__ == "__main__":
