@@ -1,38 +1,35 @@
 import os
 from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters
 from database import create_tables, add_user
-# محاولة استيراد الأوامر المتقدمة أو ملف الأدمن إن وجد
+# استيراد معالجات الأدمن والملفات الأخرى الموجودة في مشروعك
 try:
     from admin import admin_handlers
 except ImportError:
     admin_handlers = []
+try:
+    from monitor import *
+except ImportError:
+    pass
 TOKEN = "8790701693:AAHfsOlGQVqp4zNLsgcs9Racjrk99U3bN2M"
-# دالة الترحيب الأساسية عند إرسال /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-    add_user(user.id)  # تسجيل المستخدم في القاعدة إذا كانت الدالة تدعم ذلك
+    add_user(user.id)
     await update.message.reply_text(
-        "أهلاً بك في بوت حركات أورانج 🚀\n\n"
-        "الأوامر المتاحة:\n"
-        "/start - بدء البوت وعرض القائمة\n"
-        "/traffic - عرض حركة المرور وسجلات المكالمات"
+        "أهلاً بك في بوت حركات أورانج 🚀\n"
+        "تم تفعيل النظام بنجاح وربط كافة الملفات."
     )
-# دالة حركة المرور وسجلات المكالمات
-async def traffic(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("📊 جاري جلب أحدث بيانات حركة المرور وسجلات المكالمات من أورانج...")
 def main():
-    # إنشاء الجداول في قاعدة البيانات
-    create_tables()    
-    # بناء تطبيق تيليجرام
-    application = ApplicationBuilder().token(TOKEN).build()    
-    # إضافة الأوامر الأساسية
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("traffic", traffic))    
-    # إضافة بقية المعالجات من ملف admin إن وجدت
+    # إنشاء جداول قاعدة البيانات
+    create_tables()   
+    # بناء التطبيق
+    application = ApplicationBuilder().token(TOKEN).build()   
+    # إضافة أمر البدء
+    application.add_handler(CommandHandler("start", start))    
+    # إضافة جميع معالجات ملف admin والملفات الأخرى
     for handler in admin_handlers:
         application.add_handler(handler)        
-    print("Bot is running...")
+    print("Bot is running with all features...")
     application.run_polling()
 if __name__ == "__main__":
     main()
