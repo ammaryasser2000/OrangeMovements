@@ -27,7 +27,7 @@ async def monitor_loop():
             orange_data = await orange.get_dashboard_movements()
             await orange.close()                
             if orange_data:
-                msg = "🟧 *موقع: Orange Carrier*\n\n" + "\n".join(orange_data)
+     msg = "🟧 *موقع: Orange Carrier*\n\n" + "\n".join(orange_data)
                 await send_to_group(msg)       
         except Exception as e:
             print("Monitor Loop Error:", e)
