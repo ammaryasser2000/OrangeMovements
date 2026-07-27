@@ -1,8 +1,8 @@
 from playwright.async_api import async_playwright
 class IVAS:
     def __init__(self, email, password):
-        self.email = ammar11ammar2019@gmail.com 
-        self.password = 7700208345Ab
+        self.email = "ammar11ammar2019@gmail.com" 
+        self.password = "7700208345Ab"
     async def login(self):
         self.playwright = await async_playwright().start()
         self.browser = await self.playwright.chromium.launch(
@@ -37,8 +37,8 @@ class IVAS:
         await self.playwright.stop()
 class OrangeCarrier:
     def __init__(self, email, password):
-        self.email = ammar11ammar2019@gmail.com 
-        self.password = 7700208345Ab$
+        self.email = "ammar11ammar2019@gmail.com" 
+        self.password = "7700208345Ab$"
     async def login(self):
         self.playwright = await async_playwright().start()
         self.browser = await self.playwright.chromium.launch(
