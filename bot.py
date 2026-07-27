@@ -63,77 +63,10 @@ def main():
         )
     )
 
-    # أوامر الإدارة
     for handler in admin_handlers:
         app.add_handler(handler)
 
     print("✅ Orange Movements Bot Started")
-
-    app.run_polling()
-
-
-if __name__ == "__main__":
-    main()
-
-async def language(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    text = update.message.text
-
-    if text == "🇸🇦 العربية":
-
-        await update.message.reply_text(
-            "✅ تم اختيار العربية"
-        )
-
-    elif text == "🇬🇧 English":
-
-        await update.message.reply_text(
-            "✅ English Selected"
-        )
-
-    elif text == "🇧🇩 বাংলা":
-
-        await update.message.reply_text(
-            "✅ বাংলা নির্বাচন করা হয়েছে"
-        )
-
-
-def main():
-
-    create_tables()
-
-    app = Application.builder().token(BOT_TOKEN).build()
-
-    app.add_handler(CommandHandler("start", start))
-
-    app.add_handler(
-        MessageHandler(
-            filters.TEXT,
-            language
-        )
-    )
-
-    print("Orange Movements Started")
-
-    app.run_polling()
-
-
-if __name__ == "__main__":
-    main()        user_language[update.effective_user.id] = "en"
-        await update.message.reply_text("✅ English selected")
-
-    elif text == "🇧🇩 বাংলা":
-        user_language[update.effective_user.id] = "bn"
-        await update.message.reply_text("✅ বাংলা নির্বাচন করা হয়েছে")
-
-
-def main():
-    app = Application.builder().token(TOKEN).build()
-
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT, language))
-
-    print("Orange Movements Bot Started")
 
     app.run_polling()
 
