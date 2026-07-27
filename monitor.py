@@ -13,21 +13,19 @@ async def monitor_loop():
     print("Starting monitoring loop for websites...")
     while True:
         try:
-            # 1. فحص الموقع الأول IVAS (ضع بريدك وكلمة المرور بين علامات التنصيص)
             ivas = IVAS("ammar11ammar2019@gmail.com", "7700208345Ab")
             await ivas.login()
-            ivas_data = await ivas.open_live()
-            await ivas.close()
-     if ivas_data:
-                await send_telegram_alert("📊 تم فحص حساب IVAS وسحب البيانات بنجاح!")
-            # 2. فحص الموقع الثاني OrangeCarrier (ضع بريدك وكلمة المرور بين علامات التنصيص)
+            ivas_data = await ivas.get_live_movements()
+            await ivas.close()            
+            if ivas_data:
+                await send_telegram_alert(f"📊 حركات IVAS الجديدة:\n" + "\n".join(ivas_data[:5]))
+example_orange@gmail.com
             orange = OrangeCarrier("ammar11ammar2019@gmail.com", "7700208345Ab$")
             await orange.login()
-            orange_data = await orange.dashboard()
-            await orange.close()           
+            orange_data = await orange.get_dashboard_movements()
+            await orange.close()            
             if orange_data:
-                await send_telegram_alert("📊 تم فحص حساب OrangeCarrier وسحب البيانات بنجاح!")           
+                await send_telegram_alert(f"📊 حركات Orange الجديدة:\n" + "\n".join(orange_data[:5]))
         except Exception as e:
-            print("Monitor Loop Error:", e)
-        # الفحص كل 60 ثانية (دقيقة واحدة)
+            print("Monitor Loop Error:", e)        
         await asyncio.sleep(60)
