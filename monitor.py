@@ -1,70 +1,28 @@
-from playwright.async_api import async_playwright
-
-class IVAS:
-    def __init__(self, email, password):
-        self.email = email
-        self.password = password
-
-    async def login(self):
-        self.playwright = await async_playwright().start()
-        self.browser = await self.playwright.chromium.launch(
-            headless=True
-        )
-        self.page = await self.browser.new_page()
-
-        await self.page.goto(
-            "https://www.ivasms.com/login"
-        )
-        await self.page.fill(
-            'input[type="ammar11ammar2019@gmail.com"]',
-            self.email
-        )
-        await self.page.fill(
-            'input[type="7700208345Ab"]',
-            self.password
-        )
-        await self.page.click(
-            'button[type="submit"]'
-        )
-        await self.page.wait_for_timeout(5000)
-    async def open_live(self):
-        await self.page.goto(
-            "https://www.ivasms.com/portal/live/test_sms"
-        )
-        await self.page.wait_for_timeout(3000)
-        html = await self.page.content()
-        return html
-   async def close(self):
-        await self.browser.close()
-        await self.playwright.stop()
-class OrangeCarrier:
-    def __init__(self, email, password):
-        self.email = email
-        self.password = password
-    async def login(self):
-        self.playwright = await async_playwright().start()
-        self.browser = await self.playwright.chromium.launch(
-            headless=True
-        )
-        self.page = await self.browser.new_page()
-        await self.page.goto(
-            "https://www.orangecarrier.com/login"
-        )
-        await self.page.fill(
-            'input[type="ammar11ammar2019@gmail.com"]',
-            self.email
-        )
-        await self.page.fill(
-            'input[type="7700208345Ab$"]',
-            self.password
-        )
-        await self.page.click(
-            'button[type="submit"]'
-        )
-        await self.page.wait_for_timeout(5000)
-    async def dashboard(self):
-        html = await self.page.content()
-        return html
-    async def close(self):
-        await self.browser.close()
-        await self.playwright.stop()
+import asyncio
+from sources import IVAS, OrangeCarrier
+from telegram import Bot
+TELEGRAM_TOKEN = "8790701693:AAHfsOlGQVqp4zNLsgcs9Racjrk99U3bN2M"
+CHAT_ID = 8907883947
+async def send_telegram_alert(message):
+    bot = Bot(token=TELEGRAM_TOKEN)
+    try:
+        await bot.send_message(chat_id=CHAT_ID, text=message)
+    except Exception as e:
+        print("Telegram Error:", e)
+async def monitor_loop():
+    print("Starting monitoring loop...")
+    while True:
+        try:
+            # مثال لاستخدام IVAS مع وضع البريد وكلمة المرور بين علامات التنصيص
+            ivas = IVAS("example@gmail.com", "your_password")
+            await ivas.login()
+            html_content = await ivas.open_live()
+            await ivas.close()
+                        if html_content:
+                await send_telegram_alert("📊 تم فحص حركة المرور بنجاح!")
+     except Exception as e:
+            print("Monitor Loop Error:", e)
+        
+        await asyncio.sleep(60)
+if __name__ == "__main__":
+    asyncio.run(monitor_loop())
