@@ -4,24 +4,27 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
 from monitor import monitor_loop
 from sources import IVAS, OrangeCarrier
-ADMIN_IDS = [8907883947]  # الآيدي الخاص بك
+ADMIN_IDS = [8907883947]  # الآيدي الخاص بك كمدير
 subscriptions = {}
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if user_id in ADMIN_IDS or (user_id in subscriptions and subscriptions[user_id] > datetime.now()):
         await update.message.reply_text("🚀 أهلاً بك! اشتراكك ساري.\nاستخدم الأمر /movements لعرض حركات الموقعين معاً.")
     else:
-        await update.message.reply_text("عذراً، اشتراكاتك غير سارية أو منتهية. يرجى التواصل مع المشرف لتفعيل الاشتراك.")
+        # تم تعديل يوزر التواصل ليصبح المعرف المطلوب مباشرة
+        text = (
+            "❌ عذراً، اشتراكك غير ساري أو منته.\n"
+            "للاشتراك وتفعيل البوت (شهري / أسبوعي)، يرجى التواصل مع المشرف عبر الحساب التالي:\n"
+            "👉 t.me/b_6_01"
+        )
+        await update.message.reply_text(text)
 async def show_movements(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if not (user_id in ADMIN_IDS or (user_id in subscriptions and subscriptions[user_id] > datetime.now())):
         await update.message.reply_text("❌ هذا الأمر يتطلب اشتراكاً سارياً.")
         return
-
-    await update.message.reply_text("⏳ جاري جلب الحركات والدول من موقعي IVAS و Orange Carrier...")
-    
-    response_text = ""
-    
+    await update.message.reply_text("⏳ جاري جلب الحركات والدول من موقعي IVAS و Orange Carrier...")    
+    response_text = ""    
     # 1. جلب حركات IVAS
     try:
         ivas = IVAS("ammaryasser2019@gmail.com", "7700208345Ab")
@@ -62,10 +65,10 @@ def main():
     app = ApplicationBuilder().token("8790701693:AAHfsOlGQVqp4zNLsgcs9Racjrk99U3bN2M").build()    
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("movements", show_movements))
-    app.add_handler(CommandHandler("add", add_subscriber))    
+    app.add_handler(CommandHandler("add", add_subscriber))
     loop = asyncio.get_event_loop()
-    loop.create_task(monitor_loop())    
-    print("Bot is running with full features...")
+    loop.create_task(monitor_loop())  
+    print("Bot is running successfully with updated username...")
     app.run_polling()
 if __name__ == "__main__":
     main()
