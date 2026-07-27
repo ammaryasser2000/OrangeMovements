@@ -17,18 +17,18 @@ async def monitor_loop():
             ivas = IVAS("ammaryasser2019@gmail.com", "7700208345Ab")
             await ivas.login()
             ivas_data = await ivas.get_live_movements()
-            await ivas.close()      
-            if ivas_data:
+            await ivas.close()
+                if ivas_data:
                 msg = "🌐 *موقع: IVAS*\n\n" + "\n".join(ivas_data)
                 await send_to_group(msg)
             # 2. سحب الحركات من موقع Orange Carrier
             orange = OrangeCarrier("ammaryasser2019@gmail.com", "7700208345Ab$")
             await orange.login()
             orange_data = await orange.get_dashboard_movements()
-            await orange.close()                
-            if orange_data:
-     msg = "🟧 *موقع: Orange Carrier*\n\n" + "\n".join(orange_data)
-                await send_to_group(msg)       
-        except Exception as e:
+            await orange.close()         
+          if orange_data:
+                msg = "🟧 *موقع: Orange Carrier*\n\n" + "\n".join(orange_data)
+                await send_to_group(msg)
+                    except Exception as e:
             print("Monitor Loop Error:", e)
-  await asyncio.sleep(30)
+                await asyncio.sleep(30)
