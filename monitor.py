@@ -13,16 +13,14 @@ async def monitor_loop():
     print("Starting monitoring loop...")
     while True:
         try:
-            # مثال لاستخدام IVAS مع وضع البريد وكلمة المرور بين علامات التنصيص
             ivas = IVAS("example@gmail.com", "your_password")
             await ivas.login()
             html_content = await ivas.open_live()
-            await ivas.close()
-                        if html_content:
-                await send_telegram_alert("📊 تم فحص حركة المرور بنجاح!")
-     except Exception as e:
+            await ivas.close()            
+            if html_content:
+                await send_telegram_alert("📊 تم فحص حركة المرور بنجاح!")            
+        except Exception as e:
             print("Monitor Loop Error:", e)
-        
         await asyncio.sleep(60)
 if __name__ == "__main__":
     asyncio.run(monitor_loop())
