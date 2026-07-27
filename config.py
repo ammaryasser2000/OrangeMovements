@@ -12,19 +12,18 @@ DATABASE_NAME = os.getenv("DATABASE_NAME", "orange.db")
 
 # بيانات IVAS
 IVAS_EMAIL = os.getenv("ammar11ammar2019@gmail.com")
-IVAS_PASSWORD = os.getenv("7700208345Ab")
+IVAS_PASSWORD = os.getenv("770208345Ab")
 
 # بيانات OrangeCarrier
 ORANGE_EMAIL = os.getenv("ammar11ammar2019@gmail.com")
-ORANGE_PASSWORD = os.getenv("7700208345Ab$")
+ORANGE_PASSWORD = os.getenv("770208345Ab$")
 
 # مدة الفحص (كل 30 ثانية)
 CHECK_INTERVAL = 30
 
-# آيديات الأدمن (8907883947)
+# آيديات الأدمن
 ADMIN_IDS = [
-    # مثال:
-    # 123456789
+    8907883947
 ]
 
 # حسابات الدعم
