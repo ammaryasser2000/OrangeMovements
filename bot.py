@@ -14,7 +14,7 @@ def main():
     application.add_handler(CommandHandler("start", start))    
     # إضافة دوال الأدمن الأخرى
     for handler in admin_handlers:
-        application.add_handler(handler)     
+        application.add_handler(handler)        
     print("Bot is running...")
     application.run_polling()
 if __name__ == "__main__":
