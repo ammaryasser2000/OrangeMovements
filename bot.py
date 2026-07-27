@@ -7,7 +7,6 @@ from sources import IVAS, OrangeCarrier
 ADMIN_IDS = [8907883947]  # الآيدي الخاص بك
 subscriptions = {}
 async def set_bot_commands(application):
-    # تعيين الأوامر لتظهر في زر القائمة (Menu) بجانب خانة الكتابة
     commands = [
         ("start", "تشغيل البوت وبدء الاستخدام"),
         ("movements", "عرض الحركات والدول الحالية"),
@@ -29,14 +28,14 @@ async def show_movements(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not (user_id in ADMIN_IDS or (user_id in subscriptions and subscriptions[user_id] > datetime.now())):
         await update.message.reply_text("❌ هذا الأمر يتطلب اشتراكاً سارياً.")
         return
-  await update.message.reply_text("⏳ جاري جلب الحركات والدول من المواقع...")
+    await update.message.reply_text("⏳ جاري جلب الحركات والدول من المواقع...")
       response_text = ""
     try:
         ivas = IVAS("ammaryasser2019@gmail.com", "7700208345Ab")
         await ivas.login()
         ivas_data = await ivas.get_live_movements()
-        await ivas.close()
-             if ivas_data:
+        await ivas.close()    
+        if ivas_data:
             response_text += "🌐 **حركات موقع IVAS:**\n\n" + "\n".join(ivas_data[:5]) + "\n\n"
         else:
             response_text += "🌐 **حركات موقع IVAS:** لا توجد حركات حالياً.\n\n"
@@ -46,8 +45,8 @@ async def show_movements(update: Update, context: ContextTypes.DEFAULT_TYPE):
         orange = OrangeCarrier("ammaryasser2019@gmail.com", "7700208345Ab$")
         await orange.login()
         orange_data = await orange.get_dashboard_movements()
-        await orange.close()
-                if orange_data:
+        await orange.close()      
+        if orange_data:
             response_text += "🟧 **حركات موقع Orange:**\n\n" + "\n".join(orange_data[:5])
         else:
             response_text += "🟧 **حركات موقع Orange:** لا توجد حركات حالياً."
@@ -67,14 +66,13 @@ async def add_subscriber(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("خطأ. استخدم: /add [User_ID] [عدد_الأيام]")
 def main():
     app = ApplicationBuilder().token("8790701693:AAHfsOlGQVqp4zNLsgcs9Racjrk99U3bN2M").build()
-        app.add_handler(CommandHandler("start", start))
+      app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("movements", show_movements))
     app.add_handler(CommandHandler("add", add_subscriber))
-        # تسجيل الأوامر عند الإقلاع
-    app.job_queue.run_once(lambda ctx: asyncio.create_task(set_bot_commands(app)), 1)    
-    loop = asyncio.get_event_loop()
+      app.job_queue.run_once(lambda ctx: asyncio.create_task(set_bot_commands(app)), 1)
+       loop = asyncio.get_event_loop()
     loop.create_task(monitor_loop())
-        print("Bot is running with full menu and features...")
+      print("Bot is running with full menu and features...")
     app.run_polling()
 if __name__ == "__main__":
     main()
