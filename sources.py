@@ -4,8 +4,8 @@ from playwright.async_api import async_playwright
 class IVAS:
 
     def __init__(self, email, password):
-        self.email = ammar11ammar2019@gmail.com 
-        self.password = 7700208345Ab
+        self.email = email
+        self.password = password
 
     async def login(self):
 
@@ -59,8 +59,8 @@ class IVAS:
 class OrangeCarrier:
 
     def __init__(self, email, password):
-        self.email = ammar11ammar2019@gmail.com 
-        self.password = 7700208345Ab$
+        self.email = email
+        self.password = password
 
     async def login(self):
 
