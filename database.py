@@ -1,8 +1,10 @@
 import sqlite3
 from config import DATABASE_NAME
 
+
 def connect():
     return sqlite3.connect(DATABASE_NAME)
+
 
 def create_tables():
     conn = connect()
@@ -20,8 +22,31 @@ def create_tables():
     )
     """)
 
+    # جدول الحركات
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS movements (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        country TEXT,
+        number TEXT,
+        created_at TEXT
+    )
+    """)
+
+    # جدول الاشتراكات
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS subscriptions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        plan TEXT,
+        start_date TEXT,
+        end_date TEXT,
+        active INTEGER DEFAULT 1
+    )
+    """)
+
     conn.commit()
     conn.close()
+
 
 def add_user(user_id, username, full_name):
     conn = connect()
@@ -35,6 +60,7 @@ def add_user(user_id, username, full_name):
 
     conn.commit()
     conn.close()
+
 
 def get_user(user_id):
     conn = connect()
@@ -50,24 +76,3 @@ def get_user(user_id):
     conn.close()
 
     return user
-    # جدول الحركات الجديدة
-cur.execute("""
-CREATE TABLE IF NOT EXISTS movements (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    country TEXT,
-    number TEXT,
-    created_at TEXT
-)
-""")
-
-# جدول الاشتراكات
-cur.execute("""
-CREATE TABLE IF NOT EXISTS subscriptions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER,
-    plan TEXT,
-    start_date TEXT,
-    end_date TEXT,
-    active INTEGER DEFAULT 1
-)
-""")
