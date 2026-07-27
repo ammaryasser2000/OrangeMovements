@@ -19,7 +19,7 @@ async def monitor_loop():
             await ivas.close()            
             if ivas_data:
                 await send_telegram_alert(f"📊 حركات IVAS الجديدة:\n" + "\n".join(ivas_data[:5]))
-example_orange@gmail.com
+ammar11ammar2019@gmail.com 
             orange = OrangeCarrier("ammar11ammar2019@gmail.com", "7700208345Ab$")
             await orange.login()
             orange_data = await orange.get_dashboard_movements()
