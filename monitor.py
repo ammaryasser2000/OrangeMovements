@@ -25,8 +25,8 @@ async def monitor_loop():
             orange = OrangeCarrier("ammaryasser2019@gmail.com", "7700208345Ab$")
             await orange.login()
             orange_data = await orange.get_dashboard_movements()
-            await orange.close()
-                   if orange_data:
+            await orange.close()                
+            if orange_data:
                 msg = "🟧 *موقع: Orange Carrier*\n\n" + "\n".join(orange_data)
                 await send_to_group(msg)       
         except Exception as e:
