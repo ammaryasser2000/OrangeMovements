@@ -1,78 +1,131 @@
 import asyncio
 from datetime import datetime, timedelta
 from telegram import Update, BotCommand
-from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
+from telegram.ext import (
+    ApplicationBuilder,
+    ContextTypes,
+    CommandHandler,
+)
+from config import (
+    BOT_TOKEN,
+    ADMIN_IDS,
+    IVAS_EMAIL,
+    IVAS_PASSWORD,
+    ORANGE_EMAIL,
+    ORANGE_PASSWORD,
+)
 from monitor import monitor_loop
 from sources import IVAS, OrangeCarrier
-ADMIN_IDS = [8907883947]  # الآيدي الخاص بك
 subscriptions = {}
-async def set_bot_commands(application):
-    commands = [
-        ("start", "تشغيل البوت وبدء الاستخدام"),
-        ("movements", "عرض الحركات والدول الحالية"),
-    ]
-    await application.bot.set_my_commands(commands)
+async def set_bot_commands(app):
+    await app.bot.set_my_commands([
+        BotCommand("start", "تشغيل البوت"),
+        BotCommand("movements", "عرض الحركات"),
+    ])
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    if user_id in ADMIN_IDS or (user_id in subscriptions and subscriptions[user_id] > datetime.now()):
-        await update.message.reply_text("🚀 أهلاً بك! اشتراكك ساري.\nاستخدم زر الأوامر أو /movements لعرض الحركات.")
-    else:
-        text = (
-            "❌ عذراً، اشتراكك غير ساري أو منته.\n"
-            "للاشتراك وتفعيل البوت، يرجى التواصل مع المشرف عبر الحساب التالي:\n"
-            "👉 t.me/b_6_01"
+   user_id = update.effective_user.id
+    if (
+        user_id in ADMIN_IDS
+        or (
+            user_id in subscriptions
+            and subscriptions[user_id] > datetime.now()
         )
-        await update.message.reply_text(text)
+    ):
+      await update.message.reply_text(
+            "✅ أهلاً بك.\nاستخدم /movements لعرض الحركات."
+        )
+    else:
+      await update.message.reply_text(
+            "❌ اشتراكك غير مفعل.\n\n"
+            "للتفعيل تواصل مع:\n"
+            "@b_6_01"
+        )
 async def show_movements(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
-    if not (user_id in ADMIN_IDS or (user_id in subscriptions and subscriptions[user_id] > datetime.now())):
-        await update.message.reply_text("❌ هذا الأمر يتطلب اشتراكاً سارياً.")
+    if (
+        user_id not in ADMIN_IDS
+        and (
+            user_id not in subscriptions
+            or subscriptions[user_id] < datetime.now()
+        )
+    ):
+      await update.message.reply_text(
+            "❌ اشتراكك غير مفعل."
+        )
         return
-    await update.message.reply_text("⏳ جاري جلب الحركات والدول من المواقع...")
-      response_text = ""
+   await update.message.reply_text("⏳ جاري جلب الحركات...")
+    response = ""
     try:
-        ivas = IVAS("ammaryasser2019@gmail.com", "7700208345Ab")
-        await ivas.login()
-        ivas_data = await ivas.get_live_movements()
-        await ivas.close()    
-        if ivas_data:
-            response_text += "🌐 **حركات موقع IVAS:**\n\n" + "\n".join(ivas_data[:5]) + "\n\n"
+        ivas = IVAS(
+            IVAS_EMAIL,
+            IVAS_PASSWORD
+        )
+      await ivas.login()
+      data = await ivas.get_live_movements()         await ivas.close()
+     response += "🟠 IVAS\n\n"
+        if data:
+            response += "\n".join(data[:10])
         else:
-            response_text += "🌐 **حركات موقع IVAS:** لا توجد حركات حالياً.\n\n"
-    except Exception as e:
-        response_text += f"🌐 **حركات موقع IVAS:** خطأ ({e})\n\n"
+            response += "لا توجد حركات"
+  except Exception as e:
+       response += f"IVAS ERROR\n{e}"
+    response += "\n\n"
     try:
-        orange = OrangeCarrier("ammaryasser2019@gmail.com", "7700208345Ab$")
-        await orange.login()
-        orange_data = await orange.get_dashboard_movements()
-        await orange.close()      
-        if orange_data:
-            response_text += "🟧 **حركات موقع Orange:**\n\n" + "\n".join(orange_data[:5])
+        orange = OrangeCarrier(
+            ORANGE_EMAIL,
+            ORANGE_PASSWORD
+        )
+    await orange.login()
+      data = await orange.get_dashboard_movements()
+        await orange.close()
+       response += "🟧 OrangeCarrier\n\n"
+        if data:
+            response += "\n".join(data[:10])
         else:
-            response_text += "🟧 **حركات موقع Orange:** لا توجد حركات حالياً."
-    except Exception as e:
-        response_text += f"🟧 **حركات موقع Orange:** خطأ ({e})"
-    await update.message.reply_text(response_text, parse_mode="Markdown")
+            response += "لا توجد حركات"
+   except Exception as e:
+        response += f"Orange ERROR\n{e}"
+   await update.message.reply_text(response)
 async def add_subscriber(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id not in ADMIN_IDS:
         return
     try:
-        args = context.args
-        target_user_id = int(args[0])
-        days = int(args[1])
-        subscriptions[target_user_id] = datetime.now() + timedelta(days=days)
-        await update.message.reply_text(f"✅ تم تفعيل الاشتراك للمستخدم {target_user_id} لمدة {days} يوم.")
-    except:
-        await update.message.reply_text("خطأ. استخدم: /add [User_ID] [عدد_الأيام]")
+     target = int(context.args[0])
+     days = int(context.args[1])
+     subscriptions[target] = (
+            datetime.now() + timedelta(days=days)
+        )
+        await update.message.reply_text(
+            "✅ تم التفعيل."
+        )
+   except:
+       await update.message.reply_text(
+            "/add user_id days"
+        )
+async def post_init(app):
+    await set_bot_commands(app)
+    asyncio.create_task(
+        monitor_loop(app.bot)
+    )
 def main():
-    app = ApplicationBuilder().token("8790701693:AAHfsOlGQVqp4zNLsgcs9Racjrk99U3bN2M").build()
-      app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("movements", show_movements))
-    app.add_handler(CommandHandler("add", add_subscriber))
-      app.job_queue.run_once(lambda ctx: asyncio.create_task(set_bot_commands(app)), 1)
-       loop = asyncio.get_event_loop()
-    loop.create_task(monitor_loop())
-      print("Bot is running with full menu and features...")
+    app = (
+        ApplicationBuilder()
+        .token(BOT_TOKEN)
+        .post_init(post_init)
+        .build()
+    )
+    app.add_handler(
+        CommandHandler("start", start)
+    )
+
+    app.add_handler(
+        CommandHandler("movements", show_movements)
+    )
+
+    app.add_handler(
+        CommandHandler("add", add_subscriber)
+    )
+    print("Orange Movements Started")
     app.run_polling()
 if __name__ == "__main__":
     main()
