@@ -1,7 +1,6 @@
 python-telegram-bot==21.7
-playwright
-beautifulsoup4
-requests
-aiosqlite
-python-dotenv
-lxml
+playwright==1.54.0
+beautifulsoup4==4.13.4
+requests==2.32.4
+python-dotenv==1.1.1
+aiosqlite==0.21.0
