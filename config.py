@@ -6,11 +6,11 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 # Database
 DATABASE_NAME = "orange.db"
 # IVAS
-IVAS_EMAIL = os.getenv("ammar11ammar2019@gmail.com")
-IVAS_PASSWORD = os.getenv("770208345Ab")
+IVAS_EMAIL = os.getenv("IVAS_EMAIL")
+IVAS_PASSWORD = os.getenv("IVAS_PASSWORD")
 # Orange Carrier
-ORANGE_EMAIL = os.getenv("ammar11ammar2019@gmail.com")
-ORANGE_PASSWORD = os.getenv("770208345Ab$")
+ORANGE_EMAIL = os.getenv("ORANGE_EMAIL")
+ORANGE_PASSWORD = os.getenv("ORANGE_PASSWORD")
 # Telegram Group
 GROUP_ID = int(os.getenv("GROUP_ID", "-1003764162114"))
 # Admin
