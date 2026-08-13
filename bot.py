@@ -1,131 +1,85 @@
+import os
 import asyncio
-from datetime import datetime, timedelta
-from telegram import Update, BotCommand
-from telegram.ext import (
-    ApplicationBuilder,
-    ContextTypes,
-    CommandHandler,
-)
-from config import (
-    BOT_TOKEN,
-    ADMIN_IDS,
-    IVAS_EMAIL,
-    IVAS_PASSWORD,
-    ORANGE_EMAIL,
-    ORANGE_PASSWORD,
-)
-from monitor import monitor_loop
-from sources import IVAS, OrangeCarrier
-subscriptions = {}
-async def set_bot_commands(app):
-    await app.bot.set_my_commands([
-        BotCommand("start", "تشغيل البوت"),
-        BotCommand("movements", "عرض الحركات"),
-    ])
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-   user_id = update.effective_user.id
-    if (
-        user_id in ADMIN_IDS
-        or (
-            user_id in subscriptions
-            and subscriptions[user_id] > datetime.now()
+from playwright.async_api import async_playwright
+class IVAS:
+    def __init__(self):
+        self.email = os.getenv("IVAS_EMAIL")
+        self.password = os.getenv("IVAS_PASSWORD")
+        self.browser = None
+        self.page = None
+        self.playwright = None
+    async def login(self):
+        self.playwright = await async_playwright().start()
+        self.browser = await self.playwright.chromium.launch(
+            headless=True,
+            args=[
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-dev-shm-usage",
+            ],
         )
-    ):
-      await update.message.reply_text(
-            "✅ أهلاً بك.\nاستخدم /movements لعرض الحركات."
+        self.page = await self.browser.new_page()
+        await self.page.goto(
+            "https://www.ivasms.com/login",
+            wait_until="domcontentloaded",
         )
-    else:
-      await update.message.reply_text(
-            "❌ اشتراكك غير مفعل.\n\n"
-            "للتفعيل تواصل مع:\n"
-            "@b_6_01"
+        # نحتاج تحديد حقول تسجيل الدخول الفعلية للموقع.
+        print("IVAS page opened")
+    async def get_live_movements(self):
+        await self.page.goto(
+            "https://www.ivasms.com/portal/live/test_sms",
+            wait_until="domcontentloaded",
         )
-async def show_movements(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    if (
-        user_id not in ADMIN_IDS
-        and (
-            user_id not in subscriptions
-            or subscriptions[user_id] < datetime.now()
+        await self.page.wait_for_timeout(5000)
+        # هنا سنقرأ أسماء الدول/الحركة فقط
+        return ["IVAS: تم فتح صفحة Live"]
+class OrangeCarrier:
+    def __init__(self):
+        self.email = os.getenv("ORANGE_EMAIL")
+        self.password = os.getenv("ORANGE_PASSWORD")
+        self.browser = None
+        self.page = None
+        self.playwright = None
+    async def login(self):
+        self.playwright = await async_playwright().start()
+        self.browser = await self.playwright.chromium.launch(
+            headless=True,
+            args=[
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-dev-shm-usage",
+            ],
         )
-    ):
-      await update.message.reply_text(
-            "❌ اشتراكك غير مفعل."
+        self.page = await self.browser.new_page()
+        await self.page.goto(
+            "https://www.orangecarrier.com/login",
+            wait_until="domcontentloaded",
         )
-        return
-   await update.message.reply_text("⏳ جاري جلب الحركات...")
-    response = ""
+        print("Orange page opened")
+    async def get_dashboard_movements(self):
+        await self.page.goto(
+            "https://www.orangecarrier.com/portal/live/test_sms",
+            wait_until="domcontentloaded",     )
+        await self.page.wait_for_timeout(5000)
+        return ["Orange: تم فتح صفحة Live"]
+async def main():
+    ivas = IVAS()
+    orange = OrangeCarrier()
     try:
-        ivas = IVAS(
-            IVAS_EMAIL,
-            IVAS_PASSWORD
-        )
-      await ivas.login()
-      data = await ivas.get_live_movements()         await ivas.close()
-     response += "🟠 IVAS\n\n"
-        if data:
-            response += "\n".join(data[:10])
-        else:
-            response += "لا توجد حركات"
-  except Exception as e:
-       response += f"IVAS ERROR\n{e}"
-    response += "\n\n"
-    try:
-        orange = OrangeCarrier(
-            ORANGE_EMAIL,
-            ORANGE_PASSWORD
-        )
-    await orange.login()
-      data = await orange.get_dashboard_movements()
-        await orange.close()
-       response += "🟧 OrangeCarrier\n\n"
-        if data:
-            response += "\n".join(data[:10])
-        else:
-            response += "لا توجد حركات"
-   except Exception as e:
-        response += f"Orange ERROR\n{e}"
-   await update.message.reply_text(response)
-async def add_subscriber(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.effective_user.id not in ADMIN_IDS:
-        return
-    try:
-     target = int(context.args[0])
-     days = int(context.args[1])
-     subscriptions[target] = (
-            datetime.now() + timedelta(days=days)
-        )
-        await update.message.reply_text(
-            "✅ تم التفعيل."
-        )
-   except:
-       await update.message.reply_text(
-            "/add user_id days"
-        )
-async def post_init(app):
-    await set_bot_commands(app)
-    asyncio.create_task(
-        monitor_loop(app.bot)
-    )
-def main():
-    app = (
-        ApplicationBuilder()
-        .token(BOT_TOKEN)
-        .post_init(post_init)
-        .build()
-    )
-    app.add_handler(
-        CommandHandler("start", start)
-    )
-
-    app.add_handler(
-        CommandHandler("movements", show_movements)
-    )
-
-    app.add_handler(
-        CommandHandler("add", add_subscriber)
-    )
-    print("Orange Movements Started")
-    app.run_polling()
+        await ivas.login()
+        await orange.login()
+        ivas_data = await ivas.get_live_movements()
+        orange_data = await orange.get_dashboard_movements()
+        print(ivas_data)
+        print(orange_data)
+    finally:
+        if ivas.browser:
+            await ivas.browser.close()
+        if orange.browser:
+            await orange.browser.close()
+        if ivas.playwright:
+            await ivas.playwright.stop()
+  if orange.playwright:
+            await orange.playwright.stop()
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
